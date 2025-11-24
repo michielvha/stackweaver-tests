@@ -31,7 +31,7 @@ resource "null_resource" "resource_2" {
 }
 
 resource "time_sleep" "resource_3" {
-  create_duration = "15"
+  create_duration = "15s"
 }
 
 resource "null_resource" "resource_3" {
