@@ -1,14 +1,63 @@
-# Stackweaver Tests
+# StackWeaver Tests Repository
+
+This repository contains test configurations for the StackWeaver platform.
+
+## Contents
+
+### Terraform
+Root directory contains Terraform configuration files for testing the Terraform workspace integration.
+
+- `main.tf` - Main Terraform configuration
+- `providers.tf` - Provider configuration
+- `variables.tf` - Input variables
+
+### Ansible
+The `ansible/` directory contains sample Ansible playbooks for testing the Ansible integration.
+
+#### Playbooks
+
+| Playbook | Description |
+|----------|-------------|
+| `ansible/site.yml` | Main entry point playbook (default) |
+| `ansible/playbooks/hello-world.yml` | Simple localhost playbook for testing |
+| `ansible/playbooks/deploy.yml` | Application deployment example |
+
+#### Structure
+
+```
+ansible/
+├── site.yml                    # Main playbook (default)
+├── group_vars/
+│   └── all.yml                 # Variables for all hosts
+├── inventory/
+│   └── hosts.ini               # Sample static inventory
+├── playbooks/
+│   ├── hello-world.yml         # Simple test playbook
+│   └── deploy.yml              # Deployment playbook
+└── roles/
+    ├── common/
+    │   └── tasks/main.yml      # Common system tasks
+    └── webserver/
+        ├── tasks/main.yml      # Nginx installation
+        ├── handlers/main.yml   # Service handlers
+        └── templates/
+            ├── index.html.j2   # Web page template
+            └── nginx.conf.j2   # Nginx config template
+```
+
+---
+
+## Terraform Testing
 
 Stackweaver aims to be fully TFE compliant, meaning the TFE provider can be used just as in Terraform Enterprise.
 
-## Authentication
+### Authentication
 
 Stackweaver supports TFE token authentication. You can use either:
 1. **Environment Variable** (Recommended): Set `TFE_TOKEN` environment variable
 2. **In providers.tf**: Hardcode the token (not recommended for production)
 
-### Using Environment Variable (Recommended)
+#### Using Environment Variable (Recommended)
 
 **Bash/Zsh:**
 ```bash
@@ -25,7 +74,7 @@ $env:TFE_TOKEN="tfe-mClfNZcWAVLZ3WIeokekEEnmFY8-DCI0H_GSG07kGOo"
 set TFE_TOKEN=tfe-mClfNZcWAVLZ3WIeokekEEnmFY8-DCI0H_GSG07kGOo
 ```
 
-### Using providers.tf (Not Recommended)
+#### Using providers.tf (Not Recommended)
 
 You can also hardcode the token in `providers.tf`, but this is not recommended for production:
 

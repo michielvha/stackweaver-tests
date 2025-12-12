@@ -1,0 +1,38 @@
+---
+# Common role - applied to all hosts
+# Handles basic system configuration
+
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - curl
+    - wget
+    - git
+    - vim
+  when: ansible_os_family in ['Debian', 'RedHat']
+  become: true
+
+- name: Ensure common directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/stackweaver
+    - /var/log/stackweaver
+
+- name: Set timezone
+  ansible.builtin.timezone:
+    name: "{{ timezone | default('UTC') }}"
+  become: true
+
+- name: Display system info
+  ansible.builtin.debug:
+    msg: |
+      System Information:
+        OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+        Kernel: {{ ansible_kernel }}
+        Architecture: {{ ansible_architecture }}
+        Memory: {{ ansible_memtotal_mb }} MB

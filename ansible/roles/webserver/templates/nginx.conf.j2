@@ -1,0 +1,25 @@
+server {
+    listen {{ webserver_port | default(80) }} default_server;
+    listen [::]:{{ webserver_port | default(80) }} default_server;
+
+    root {{ webserver_root | default('/var/www/html') }};
+    index index.html index.htm;
+
+    server_name {{ webserver_server_name | default('_') }};
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Health check endpoint for load balancers
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+}

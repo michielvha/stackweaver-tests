@@ -1,0 +1,33 @@
+---
+# Group variables for all hosts
+# These can be overridden in more specific group_vars or host_vars
+
+# System settings
+timezone: UTC
+locale: en_US.UTF-8
+
+# Common packages to install
+common_packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - jq
+
+# StackWeaver settings
+stackweaver_version: "0.1.0"
+stackweaver_environment: development
+
+# Webserver defaults
+webserver_enabled: true
+webserver_port: 80
+webserver_root: /var/www/html
+webserver_user: www-data
+webserver_group: www-data
+webserver_title: "StackWeaver Demo"
+webserver_server_name: "_"
+
+# Security settings
+enable_firewall: true
+ssh_port: 22

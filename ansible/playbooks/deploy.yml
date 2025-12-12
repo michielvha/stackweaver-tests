@@ -1,0 +1,51 @@
+---
+# Deploy playbook - for deploying applications
+# Alternative entry point showing different playbook organization
+
+- name: Deploy Application
+  hosts: webservers
+  gather_facts: true
+  become: true
+  
+  vars:
+    app_name: "stackweaver-demo"
+    app_version: "{{ lookup('env', 'APP_VERSION') | default('1.0.0') }}"
+    deploy_timestamp: "{{ ansible_date_time.iso8601 }}"
+
+  tasks:
+    - name: Display deployment info
+      ansible.builtin.debug:
+        msg: |
+          Deploying {{ app_name }} v{{ app_version }}
+          Target: {{ inventory_hostname }}
+          Time: {{ deploy_timestamp }}
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "/opt/{{ app_name }}"
+        state: directory
+        mode: '0755'
+
+    - name: Deploy application files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode | default('0644') }}"
+      loop:
+        - { src: 'index.html.j2', dest: '/opt/{{ app_name }}/index.html' }
+      notify: Reload application
+
+    - name: Create deployment marker
+      ansible.builtin.copy:
+        content: |
+          version: {{ app_version }}
+          deployed_at: {{ deploy_timestamp }}
+          deployed_by: stackweaver
+          commit: {{ lookup('env', 'GIT_COMMIT') | default('unknown') }}
+        dest: "/opt/{{ app_name }}/DEPLOYED"
+        mode: '0644'
+
+  handlers:
+    - name: Reload application
+      ansible.builtin.debug:
+        msg: "Application would be reloaded here"

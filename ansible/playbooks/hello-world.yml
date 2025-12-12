@@ -1,0 +1,60 @@
+---
+# Simple playbook that works without any inventory
+# Good for testing basic Ansible functionality
+
+- name: Hello World Playbook
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  tasks:
+    - name: Display welcome message
+      ansible.builtin.debug:
+        msg: |
+          ==========================================
+          Welcome to StackWeaver Ansible Integration!
+          ==========================================
+          
+          This playbook is running on: {{ ansible_hostname }}
+          Operating System: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Python Version: {{ ansible_python_version }}
+          Ansible Version: {{ ansible_version.full }}
+          
+          ==========================================
+
+    - name: Get current timestamp
+      ansible.builtin.command: date +"%Y-%m-%d %H:%M:%S"
+      register: current_time
+      changed_when: false
+
+    - name: Display timestamp
+      ansible.builtin.debug:
+        msg: "Current server time: {{ current_time.stdout }}"
+
+    - name: Create a test file
+      ansible.builtin.copy:
+        content: |
+          # StackWeaver Test File
+          Created by Ansible at {{ current_time.stdout }}
+          Host: {{ ansible_hostname }}
+          User: {{ ansible_user_id }}
+        dest: /tmp/stackweaver-test.txt
+        mode: '0644'
+
+    - name: Read back the test file
+      ansible.builtin.slurp:
+        src: /tmp/stackweaver-test.txt
+      register: test_file
+
+    - name: Display file contents
+      ansible.builtin.debug:
+        msg: "{{ test_file.content | b64decode }}"
+
+    - name: Clean up test file
+      ansible.builtin.file:
+        path: /tmp/stackweaver-test.txt
+        state: absent
+
+    - name: Final success message
+      ansible.builtin.debug:
+        msg: "✅ Playbook completed successfully!"

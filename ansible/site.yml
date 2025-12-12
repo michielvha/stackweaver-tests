@@ -1,0 +1,21 @@
+---
+# Main playbook entry point
+# This is the default playbook file that StackWeaver will look for
+
+- name: Run all plays
+  hosts: all
+  gather_facts: true
+  
+  pre_tasks:
+    - name: Display playbook info
+      ansible.builtin.debug:
+        msg: "Running StackWeaver test playbook on {{ inventory_hostname }}"
+
+  roles:
+    - common
+    - webserver
+
+  post_tasks:
+    - name: Playbook completed
+      ansible.builtin.debug:
+        msg: "All tasks completed successfully!"

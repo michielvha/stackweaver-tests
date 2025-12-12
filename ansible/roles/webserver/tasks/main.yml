@@ -1,0 +1,42 @@
+---
+# Webserver role - installs and configures nginx
+# Example of a more complex role
+
+- name: Install nginx
+  ansible.builtin.package:
+    name: nginx
+    state: present
+  become: true
+  when: webserver_enabled | default(true)
+
+- name: Create webroot directory
+  ansible.builtin.file:
+    path: "{{ webserver_root | default('/var/www/html') }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ webserver_user | default('www-data') }}"
+    group: "{{ webserver_group | default('www-data') }}"
+  become: true
+
+- name: Deploy index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ webserver_root | default('/var/www/html') }}/index.html"
+    mode: '0644'
+  become: true
+  notify: Reload nginx
+
+- name: Configure nginx
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: '0644'
+  become: true
+  notify: Reload nginx
+
+- name: Ensure nginx is running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
