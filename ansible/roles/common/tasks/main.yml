@@ -22,6 +22,7 @@
   loop:
     - /opt/stackweaver
     - /var/log/stackweaver
+  become: true
 
 - name: Set timezone
   ansible.builtin.timezone:
