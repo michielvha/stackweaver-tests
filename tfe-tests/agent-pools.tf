@@ -66,7 +66,7 @@ resource "tfe_workspace" "selfhosted-runner-test" {
   working_directory = ""
 
   vcs_repo {
-    identifier                 = "michielvha/stackweaver-test"
+    identifier                 = "michielvha/stackweaver-tests"
     branch                     = "main"
     github_app_installation_id = "94942361"
   }

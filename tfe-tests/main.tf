@@ -132,8 +132,9 @@ resource "tfe_team_organization_members" "test_team_members_1" {
 }
 
 
-
-
+resource "tfe_terraform_version" "test" {
+  version = "1.14.0"
+}
 
 
 
