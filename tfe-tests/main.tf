@@ -15,6 +15,7 @@ resource "tfe_team" "test_team_1" {
   visibility   = "organization"
 }
 
+
 // https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/workspace
 data "tfe_workspace" "test" {
   name         = "stackweaver-tests-tfe-provider"
