@@ -5,6 +5,8 @@ resource "tfe_team" "test_team" {
   name         = "test-team-tfe-provider"
   organization = var.organization
   visibility   = "organization"
+
+  sso_team_id = "dce09d32-bd13-4699-81fa-ea33f1cd5dd1"
 }
 
 resource "tfe_team" "test_team_1" {
