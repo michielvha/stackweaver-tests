@@ -17,7 +17,7 @@ resource "tfe_team" "test_team_1" {
 
 # Verify the team was created correctly
 output "sso_team_id" {
-  value = tfe_team.sso_test_team.id
+  value = tfe_team.test_team.id
 }
 
 output "sso_team_sso_id" {
