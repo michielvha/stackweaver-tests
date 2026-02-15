@@ -15,6 +15,14 @@ resource "tfe_team" "test_team_1" {
   visibility   = "organization"
 }
 
+# Verify the team was created correctly
+output "sso_team_id" {
+  value = tfe_team.sso_test_team.id
+}
+
+output "sso_team_sso_id" {
+  value = tfe_team.test_team.sso_team_id
+}
 
 // https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/workspace
 data "tfe_workspace" "test" {
