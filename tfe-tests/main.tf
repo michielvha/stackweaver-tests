@@ -13,6 +13,8 @@ resource "tfe_team" "test_team_1" {
   name         = "test-team-tfe-provider-1"
   organization = var.organization
   visibility   = "organization"
+
+  sso_team_id = "Everyone"
 }
 
 # Verify the team was created correctly
