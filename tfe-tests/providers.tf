@@ -13,10 +13,19 @@ terraform {
       source = "hashicorp/tfe"
       version = "~> 0.72.0"
     }
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
   }
 }
 
 provider "tfe" {
   hostname = "stackweaver.vhco.pro"
   token    = var.stackweaver_token
+}
+
+provider "azurerm" {
+  features {}
+  use_oidc = true
 }
