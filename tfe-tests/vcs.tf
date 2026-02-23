@@ -3,7 +3,7 @@
 
 resource "tfe_azure_oidc_configuration" "test" {
   organization    = var.organization
-  client_id       = "d8988acf-d261-49bc-8ae5-7e6df9ca06a1"
+  client_id       = "8b9af9f6-6d1c-4218-b816-47deff648ed6"
   subscription_id = "d4dee7d6-6053-45f0-ace0-af83e384e552"
   tenant_id       = "434b720d-f80a-4de1-aad9-d29e655c493c"
 }
