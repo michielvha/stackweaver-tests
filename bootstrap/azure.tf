@@ -23,7 +23,7 @@ resource "azuread_application_federated_identity_credential" "stackweaver" {
   display_name   = each.value.display_name
   description    = "Federated credential for Stackweaver workload identity federation workspace: ${each.value.workspace} (${each.value.run_phase})"
   audiences      = ["api://AzureADTokenExchange"]
-  issuer         = "https://app.terraform.io"
+  issuer         = "https://stackweaver.vhco.pro"
   subject        = each.value.subject
 }
 
