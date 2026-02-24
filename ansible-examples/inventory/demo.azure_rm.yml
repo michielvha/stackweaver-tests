@@ -1,0 +1,17 @@
+# Example Azure dynamic inventory for StackWeaver.
+# Requires: ansible-galaxy collection install azure.azcollection
+# Auth: set auth_source (auto/cli/msi/env) and ensure Azure credentials are configured.
+plugin: azure.azcollection.azure_rm
+auth_source: auto
+include_vm_resource_groups:
+  - '*'  # or list specific resource groups, e.g. my-app-rg
+# Optional: limit to VMs matching a tag (e.g. role=app)
+# include_host_filters:
+#   - "'app' in (tags.role | default(''))"
+hostnames:
+  - name
+use_contrib_script_compatible_sanitization: true
+keyed_groups:
+  - key: tags
+    prefix: tag
+    separator: ''
