@@ -27,6 +27,17 @@ resource "azuread_application_federated_identity_credential" "stackweaver" {
   subject        = each.value.subject
 }
 
+# stackweaver format 
+resource "azuread_application_federated_identity_credential" "stackweaver_format" {
+
+  application_id = azuread_application.stackweaver.id
+  display_name   = "inventory-tests"
+  description    = "Federated credential for Stackweaver workload identity federation with stackweaver format"
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = "https://stackweaver.vhco.pro"
+  subject        = "organization:main:project:default:inventory:azure-vcs-backed-di:sync"
+}
+
 # Assign roles to the service principal
 resource "azurerm_role_assignment" "stackweaver" {
   for_each = { for idx, ra in var.role_assignments : idx => ra }
