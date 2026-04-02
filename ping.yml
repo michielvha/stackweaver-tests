@@ -1,0 +1,16 @@
+---
+# Minimal playbook for E2E testing.
+# Runs locally on the ansible-runner container — no SSH, no external hosts.
+# Used by: e2e/tests/ansible-lifecycle.spec.ts
+
+- name: E2E Ping Test
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:
+
+    - name: Debug info
+      ansible.builtin.debug:
+        msg: "E2E test passed on {{ inventory_hostname }}"
