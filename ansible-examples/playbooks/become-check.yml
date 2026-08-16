@@ -1,0 +1,29 @@
+---
+# Privilege-escalation check.
+#
+# Asserts that `become: true` actually reaches root on the target, so a run that
+# connects successfully but cannot escalate fails the play instead of passing
+# quietly. Used by e2e/tests/ansible-lifecycle.spec.ts in ssh target mode.
+#
+# Meaningless with ansible_connection=local (the "escalation" would be on the
+# runner container itself), which is why the spec skips it outside ssh mode.
+
+- name: Verify privilege escalation
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Read the effective user under become
+      become: true
+      ansible.builtin.command: id -un
+      register: become_user_result
+      changed_when: false
+
+    - name: Fail unless escalation reached root
+      ansible.builtin.assert:
+        that:
+          - become_user_result.stdout | trim == 'root'
+        success_msg: "escalated to root on {{ inventory_hostname }}"
+        fail_msg: >-
+          become did not reach root on {{ inventory_hostname }}
+          (got '{{ become_user_result.stdout | trim }}')
