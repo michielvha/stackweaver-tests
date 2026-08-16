@@ -1,0 +1,140 @@
+---
+# Fleet demo playbook.
+#
+# Runs against the virtualized SSH target fleet the Stackweaver dev stack brings
+# up with `make demo-fleet` (deploy/demo-hosts + the `demo-hosts` compose
+# profile). Unlike ping.yml, this connects over real SSH, gathers real remote
+# facts and escalates with sudo, so a run proves the whole transport path.
+#
+# It is written to produce a *varied* result matrix - the thing the Fleet Run
+# Viewer exists to render: every host reports ok, only web hosts run the web
+# tasks, only db hosts run the db task, one task is skipped by design, one
+# changes on first run and reports ok on re-run, and a handler fires. Set
+# `demo_inject_failure=true` as an extra var to deliberately fail one host and
+# see the failure/rescue path.
+#
+# Host grouping comes from the inventory (webservers / databases / cache).
+
+- name: Fleet demo - converge the virtual fleet
+  hosts: all
+  gather_facts: true
+  become: false
+
+  vars:
+    demo_marker_dir: /opt/stackweaver-demo
+    demo_inject_failure: false
+    # Host that fails when demo_inject_failure is on. Overridable so the demo can
+    # point the failure at whichever host is interesting.
+    demo_failure_host: db01
+
+  handlers:
+    - name: Record converge
+      become: true
+      ansible.builtin.lineinfile:
+        path: "{{ demo_marker_dir }}/converged"
+        line: "converged {{ ansible_hostname }}"
+        create: true
+        mode: "0644"
+
+  tasks:
+    - name: Verify connectivity
+      ansible.builtin.ping:
+
+    - name: Report host identity
+      ansible.builtin.debug:
+        msg: >-
+          {{ ansible_hostname }} | {{ ansible_distribution }}
+          {{ ansible_distribution_version }} | kernel {{ ansible_kernel }} |
+          {{ ansible_processor_vcpus }} vCPU / {{ ansible_memtotal_mb }} MB
+
+    # become: true - proves privilege escalation actually works over the
+    # connection, not just that the command ran.
+    - name: Ensure demo directory exists
+      become: true
+      ansible.builtin.file:
+        path: "{{ demo_marker_dir }}"
+        state: directory
+        owner: stackweaver
+        group: stackweaver
+        mode: "0755"
+
+    # Changed on the first run, ok on every re-run - so the matrix shows both
+    # states depending on when you look.
+    - name: Write host manifest
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ demo_marker_dir }}/manifest.txt"
+        owner: stackweaver
+        group: stackweaver
+        mode: "0644"
+        content: |
+          host={{ ansible_hostname }}
+          role={{ demo_role | default('unassigned') }}
+          distribution={{ ansible_distribution }} {{ ansible_distribution_version }}
+          vcpus={{ ansible_processor_vcpus }}
+          memory_mb={{ ansible_memtotal_mb }}
+      notify: Record converge
+
+    - name: Collect uptime
+      ansible.builtin.command: uptime -p
+      register: demo_uptime
+      changed_when: false
+
+    - name: Report uptime
+      ansible.builtin.debug:
+        msg: "{{ ansible_hostname }} uptime: {{ demo_uptime.stdout }}"
+
+    # Group-conditional work: these run on a subset of the fleet, so the matrix
+    # shows real skipped cells rather than a uniform wall of green.
+    - name: Render web server config
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ demo_marker_dir }}/web.conf"
+        owner: stackweaver
+        group: stackweaver
+        mode: "0644"
+        content: |
+          listen 8080
+          server_name {{ ansible_hostname }}
+          workers {{ ansible_processor_vcpus }}
+      when: "'webservers' in group_names"
+      notify: Record converge
+
+    - name: Render database tuning
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ demo_marker_dir }}/db.conf"
+        owner: stackweaver
+        group: stackweaver
+        mode: "0644"
+        content: |
+          shared_buffers = {{ (ansible_memtotal_mb * 0.25) | int }}MB
+          max_connections = 100
+      when: "'databases' in group_names"
+      notify: Record converge
+
+    - name: Warm cache directory
+      become: true
+      ansible.builtin.file:
+        path: "{{ demo_marker_dir }}/cache"
+        state: directory
+        owner: stackweaver
+        group: stackweaver
+        mode: "0755"
+      when: "'cache' in group_names"
+
+    # Always skipped unless explicitly enabled - a permanently skipped row is
+    # useful for exercising the viewer's skipped-status rendering.
+    - name: Optional deep maintenance
+      ansible.builtin.debug:
+        msg: "deep maintenance ran on {{ ansible_hostname }}"
+      when: demo_run_maintenance | default(false) | bool
+
+    # Opt-in failure so the failed/unreachable rendering can be demoed without
+    # making the normal run red (E2E asserts hosts_failed == 0).
+    - name: Deliberate failure (demo only)
+      ansible.builtin.command: /bin/false
+      when:
+        - demo_inject_failure | bool
+        - inventory_hostname == demo_failure_host
+      changed_when: false
