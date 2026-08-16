@@ -1,0 +1,62 @@
+---
+# Incremental-output check.
+#
+# Deliberately slow: a handful of tasks separated by real sleeps, so the run
+# produces output steadily over ~16 seconds instead of finishing in one burst.
+# That window is what lets a test observe events accumulating *while* the job is
+# still running, proving output is streamed rather than flushed once the job
+# reaches a terminal state.
+#
+# Used by e2e/tests/ansible-lifecycle.spec.ts ("streams job output incrementally
+# while the job is still running"). If you shorten the sleeps or collapse the
+# tasks, that assertion loses its window and goes flaky - keep several distinct
+# tasks with a pause between them.
+#
+# Transport-independent: works unchanged with ansible_connection=local and over
+# real SSH, so it runs in both E2E target modes.
+
+- name: Emit output incrementally
+  hosts: all
+  gather_facts: false
+
+  vars:
+    # Seconds to pause between output steps. Four pauses at this value sets the
+    # observation window; the E2E spec polls once a second inside it.
+    stream_delay: 4
+
+  tasks:
+    - name: Announce the start of the stream
+      ansible.builtin.debug:
+        msg: "stream-step-1 on {{ inventory_hostname }}"
+
+    - name: Pause before the second step
+      ansible.builtin.command: "sleep {{ stream_delay }}"
+      changed_when: false
+
+    - name: Emit the second step
+      ansible.builtin.debug:
+        msg: "stream-step-2 on {{ inventory_hostname }}"
+
+    - name: Pause before the third step
+      ansible.builtin.command: "sleep {{ stream_delay }}"
+      changed_when: false
+
+    - name: Emit the third step
+      ansible.builtin.debug:
+        msg: "stream-step-3 on {{ inventory_hostname }}"
+
+    - name: Pause before the fourth step
+      ansible.builtin.command: "sleep {{ stream_delay }}"
+      changed_when: false
+
+    - name: Emit the fourth step
+      ansible.builtin.debug:
+        msg: "stream-step-4 on {{ inventory_hostname }}"
+
+    - name: Pause before the final step
+      ansible.builtin.command: "sleep {{ stream_delay }}"
+      changed_when: false
+
+    - name: Announce the end of the stream
+      ansible.builtin.debug:
+        msg: "stream-step-5 on {{ inventory_hostname }}"
