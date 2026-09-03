@@ -60,7 +60,7 @@ resource "tfe_workspace" "selfhosted-runner-test" {
   organization      = var.organization
   project_id        = data.tfe_project.default-project.id
   description       = "Test workspace for self-hosted Terraform runner via TFE provider"
-  terraform_version = "1.15.5"
+  terraform_version = "1.16.1"
   auto_apply        = false
   queue_all_runs    = false
   working_directory = ""
@@ -85,7 +85,7 @@ resource "tfe_workspace" "selfhosted-runner-cli" {
   organization      = var.organization
   project_id        = data.tfe_project.default-project.id
   description       = "CLI-driven workspace for self-hosted runner testing"
-  terraform_version = "1.15.5"
+  terraform_version = "1.16.1"
   auto_apply        = true
   queue_all_runs    = false
 }
