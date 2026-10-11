@@ -1,8 +1,6 @@
 ---
-# Installed by the Stackweaver runner before the play (requirements.yml auto-install).
-# The collection is sourced from this branch of this repository so the E2E suite never
-# depends on galaxy.ansible.com and the collection can never be pre-installed on a runner.
+# Names a collection that does not exist anywhere, so ansible-galaxy fails to resolve it.
+# The E2E suite asserts the galaxy_install_failed event and that the play still runs.
 collections:
-  - name: https://github.com/michielvha/stackweaver-tests.git#/fixtures/collections/stackweaver_e2e/
-    type: git
-    version: galaxy
+  - name: stackweaver.does_not_exist_e2e
+    version: ">=1.0.0"
