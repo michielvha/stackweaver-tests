@@ -1,0 +1,15 @@
+---
+# E2E playbook for requirements.yml auto-install. The only task that matters calls a module
+# from stackweaver.e2e, which exists nowhere but in fixtures/collections/ on this branch.
+- name: E2E Galaxy requirements test
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run a module from the auto-installed collection
+      stackweaver.e2e.e2e_marker:
+      register: marker
+
+    - name: Show the marker
+      ansible.builtin.debug:
+        msg: "{{ marker.marker }}"

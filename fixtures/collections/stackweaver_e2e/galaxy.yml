@@ -1,0 +1,12 @@
+namespace: stackweaver
+name: e2e
+version: 1.0.0
+readme: README.md
+authors:
+  - Stackweaver E2E suite
+description: Tiny collection used by the Stackweaver E2E suite to prove requirements.yml auto-install
+license:
+  - MIT
+repository: https://github.com/michielvha/stackweaver-tests
+tags:
+  - tools

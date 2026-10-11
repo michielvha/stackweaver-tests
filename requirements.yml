@@ -1,0 +1,8 @@
+---
+# Installed by the Stackweaver runner before the play (requirements.yml auto-install).
+# The collection is sourced from this branch of this repository so the E2E suite never
+# depends on galaxy.ansible.com and the collection can never be pre-installed on a runner.
+collections:
+  - name: https://github.com/michielvha/stackweaver-tests.git#/fixtures/collections/stackweaver_e2e/
+    type: git
+    version: galaxy
