@@ -1,0 +1,9 @@
+---
+# Installed by the Stackweaver executor before the play (requirements.yml auto-install). A Galaxy
+# hub collection pinned to one release, so the API's cache descriptor names it and the launcher's
+# populator verifies it against the server's artifact.sha256 (#933, D7, AC33, AC76). The server is
+# the deployment's mirror block (STACKWEAVER_GALAXY_SERVERS), which the E2E gates point at the
+# E2E mirror (e2e/fixtures/mirrors/), so no job of the suite fetches from galaxy.ansible.com.
+collections:
+  - name: ansible.posix
+    version: "2.2.2"

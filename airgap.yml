@@ -1,0 +1,40 @@
+---
+# E2E playbook for the air-gapped procedure (#933, AC76), run in an execution environment pulled
+# through the registry mirror, on a pool whose jobs network rejects everything but the API and the
+# mirror. requirements.yml installs ansible.posix from the Galaxy mirror (or the organization's
+# cache), the second task installs a hash-pinned package from the pip index into a virtualenv, and
+# the third proves the internet is out of reach.
+- name: E2E air-gapped install
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run a module from the collection the Galaxy mirror served
+      ansible.posix.rhel_facts:
+
+    - name: Install a pinned Python package from the pip index
+      ansible.builtin.shell: |
+        set -e
+        venv="${TMPDIR:-/tmp}/stackweaver-airgap-venv"
+        rm -rf "$venv"
+        "{{ ansible_playbook_python }}" -m venv "$venv"
+        "$venv/bin/pip" install --disable-pip-version-check --no-cache-dir --require-hashes -r "{{ playbook_dir }}/pip-requirements.txt"
+        "$venv/bin/python" -c 'import importlib.metadata as m; print("PIP-INSTALLED iniconfig " + m.version("iniconfig"))'
+      register: pip_install
+
+    - name: Show the pip result
+      ansible.builtin.debug:
+        msg: "{{ pip_install.stdout_lines | last }}"
+
+    - name: Try the internet
+      ansible.builtin.shell: |
+        if "{{ ansible_playbook_python }}" -c 'import urllib.request; urllib.request.urlopen("https://github.com", timeout=10)' 2>/dev/null; then
+          echo INTERNET-REACHABLE
+          exit 1
+        fi
+        echo INTERNET-BLOCKED
+      register: internet
+
+    - name: Show the internet probe
+      ansible.builtin.debug:
+        msg: "{{ internet.stdout }}"

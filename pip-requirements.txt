@@ -1,0 +1,3 @@
+# A Python requirement of airgap.yml, pinned by hash, installed from the deployment's pip index
+# (STACKWEAVER_PIP_INDEX_URL) with --require-hashes (#933, AC76).
+iniconfig==2.1.0 --hash=sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760

@@ -1,0 +1,15 @@
+---
+# E2E playbook for a Galaxy hub collection from requirements.yml (#933, AC33). The task that matters
+# calls a module of ansible.posix, installed before the play from the deployment's Galaxy server
+# or from the organization's verified cache. Runs on the local connection.
+- name: E2E Galaxy hub collection
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run a module from the installed collection
+      ansible.posix.rhel_facts:
+
+    - name: Show the marker
+      ansible.builtin.debug:
+        msg: "stackweaver-e2e-galaxy-hub-ok"
