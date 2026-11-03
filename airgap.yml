@@ -18,7 +18,7 @@
         venv="${TMPDIR:-/tmp}/stackweaver-airgap-venv"
         rm -rf "$venv"
         "{{ ansible_playbook_python }}" -m venv "$venv"
-        "$venv/bin/pip" install --disable-pip-version-check --no-cache-dir --require-hashes -r "{{ playbook_dir }}/pip-requirements.txt"
+        "$venv/bin/pip" install --disable-pip-version-check --no-cache-dir --require-hashes -r "{{ playbook_dir }}/files/pip-requirements.txt"
         "$venv/bin/python" -c 'import importlib.metadata as m; print("PIP-INSTALLED iniconfig " + m.version("iniconfig"))'
       register: pip_install
 
